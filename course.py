@@ -3,6 +3,7 @@ from PIL import Image, ImageTk
 from tkinter import ttk,messagebox
 import sqlite3
 
+
 class course_class:
     def __init__(self, r):
         self.root = r
@@ -64,11 +65,14 @@ class course_class:
         self.clear=Button(ButtonFrame,text="Clear",font="arial 13 bold",bg="orange",fg="white",cursor="hand2")
         self.clear.place(x=400,y=10,width=120,height=50)
 
+
+
+
         # Search Panel
-        search_value = StringVar()
-        search = Label(self.root, text="Course Name: ", font="arial 13",bg="white", bd="1",relief=RIDGE).place(x=600, y=80, height=55,width=160)
-        search_entry = Entry(self.root, textvariable=search_value, text="by course name", font="arial 13",bg="white").place(x=770, y=80, width=360, height=55)
-        btn_search = Button(self.root, text="Search", font="arial 13 bold", bg="dodgerblue", fg="white",cursor="hand2").place(x=1120,y=80,width=150,height=55)
+        self.search_var = StringVar()
+        search_label = Label(self.root, text="Course Name: ", font="arial 13", bg="white", bd="1", relief=RIDGE).place(x=600, y=80, height=55, width=160)
+        search_entry = Entry(self.root, textvariable=self.search_var, font="arial 13", bg="white").place(x=770, y=80, width=360, height=55)
+        btn_search = Button(self.root, text="Search", font="arial 13 bold", bg="dodgerblue", fg="white", cursor="hand2",command=self.search).place(x=1120, y=80, width=150, height=55)
 
 
         #Course frame
@@ -216,9 +220,27 @@ class course_class:
         except Exception as ex:
             messagebox.showerror("Error", f"Error occurred: {str(ex)}")
 
+    def search(self):
+        connect = sqlite3.connect(database="rms.db")
+        cursor = connect.cursor()
+
+        try:
+            # Fetch courses matching the search criteria
+            cursor.execute("SELECT * FROM course WHERE name LIKE ?", ('%' + self.search_var.get() + '%',))
+            rows = cursor.fetchall()
+
+            # Clear the existing data in the table widget
+            self.CourseTable.delete(*self.CourseTable.get_children())
+
+            # Insert fetched courses into the table widget
+            for row in rows:
+                self.CourseTable.insert('', 'end', values=row)
+
+        except Exception as ex:
+            messagebox.showerror("Error", f"Error occurred: {str(ex)}")
+
 
 if __name__ == "__main__":
     r = Tk()
     obj = course_class(r)
     r.mainloop()
-
