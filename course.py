@@ -54,16 +54,13 @@ class course_class:
 
 
         self.add=Button(ButtonFrame,text="Save",font="arial 13 bold",bg="dodgerblue",fg="white",cursor="hand2",command=self.add)
-        self.add.place(x=10,y=10,width=120,height=50)
+        self.add.place(x=10,y=10,width=163,height=50)
 
         self.update=Button(ButtonFrame,text="Update",font="arial 13 bold",bg="slateblue",fg="white",cursor="hand2", command=self.update)
-        self.update.place(x=140,y=10,width=120,height=50)
+        self.update.place(x=183,y=10,width=163,height=50)
 
         self.delete=Button(ButtonFrame,text="Delete",font="arial 13 bold",bg="tomato",fg="white",cursor="hand2", command=self.delete)
-        self.delete.place(x=270,y=10,width=120,height=50)
-
-        self.clear=Button(ButtonFrame,text="Clear",font="arial 13 bold",bg="orange",fg="white",cursor="hand2")
-        self.clear.place(x=400,y=10,width=120,height=50)
+        self.delete.place(x=356,y=10,width=163,height=50)
 
 
 
