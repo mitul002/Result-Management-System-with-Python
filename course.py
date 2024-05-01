@@ -55,10 +55,10 @@ class course_class:
         self.add=Button(ButtonFrame,text="Save",font="arial 13 bold",bg="dodgerblue",fg="white",cursor="hand2",command=self.add)
         self.add.place(x=10,y=10,width=120,height=50)
 
-        self.update=Button(ButtonFrame,text="Update",font="arial 13 bold",bg="slateblue",fg="white",cursor="hand2")
+        self.update=Button(ButtonFrame,text="Update",font="arial 13 bold",bg="slateblue",fg="white",cursor="hand2", command=self.update)
         self.update.place(x=140,y=10,width=120,height=50)
 
-        self.delete=Button(ButtonFrame,text="Delete",font="arial 13 bold",bg="tomato",fg="white",cursor="hand2")
+        self.delete=Button(ButtonFrame,text="Delete",font="arial 13 bold",bg="tomato",fg="white",cursor="hand2", command=self.delete)
         self.delete.place(x=270,y=10,width=120,height=50)
 
         self.clear=Button(ButtonFrame,text="Clear",font="arial 13 bold",bg="orange",fg="white",cursor="hand2")
@@ -93,11 +93,11 @@ class course_class:
         self.CourseTable.column("duration", width=100)
         self.CourseTable.column("charges", width=100)
         self.CourseTable.column("description", width=150)
-        self.show_courses()
+        self.show_courses()  #all previous stored data will show
 
 
 ##################
-
+#add course
     def add(self):
         connect = sqlite3.connect(database="rms.db")
         cursor = connect.cursor()
@@ -124,11 +124,81 @@ class course_class:
 
                     connect.commit()
                     messagebox.showinfo("Success", "Course Added Successfully", parent=self.root)
-                    self.show_courses()
+                    self.show_courses()  #when we add data it will show in the table instantly
 
 
         except Exception as ex:
             messagebox.showerror("Error", f"Error due to {str(ex)}")
+
+
+
+#update course
+    def update(self):
+        connect = sqlite3.connect(database="rms.db")
+        cursor = connect.cursor()
+
+        try:
+            # Message box for no course entry
+            if self.course_name_var.get() == "":
+                messagebox.showerror("Error", "Course name required", parent=self.root)
+            # Message box for entering an existing course
+            else:
+                cursor.execute("SELECT * FROM course WHERE name=?", (self.course_name_var.get(),))
+                row = cursor.fetchone()
+                if row == None:
+                    messagebox.showerror("Error", "Select course from list", parent=self.root)
+                else:
+                    cursor.execute("UPDATE course SET duration =? , charges =? , description =? where name =? ",
+                                   (
+
+                                    self.course_credit_var.get(),
+                                    self.course_fee_var.get(),
+                                    self.description_entry.get("1.0", END),
+                                    self.course_name_var.get()
+                                                )
+                                   )
+
+                    connect.commit()
+                    messagebox.showinfo("Success", "Course Update Successfully", parent=self.root)
+                    self.show_courses()  #when we add data it will show in the table instantly
+
+
+        except Exception as ex:
+            messagebox.showerror("Error", f"Error due to {str(ex)}")
+
+
+
+
+    # delete course
+    def delete(self):
+        connect = sqlite3.connect(database="rms.db")
+        cursor = connect.cursor()
+
+        try:
+            # Message box for no course entry
+            if self.course_name_var.get() == "":
+                messagebox.showerror("Error", "Course name required", parent=self.root)
+            # Message box for entering an existing course
+            else:
+                cursor.execute("SELECT * FROM course WHERE name=?", (self.course_name_var.get(),))
+                row = cursor.fetchone()
+                if row == None:
+                    messagebox.showerror("Error", "Select course from list", parent=self.root)
+                else:
+                    cursor.execute("DELETE FROM course WHERE name=?",
+                                      (self.course_name_var.get(),)
+                                   )
+
+                    connect.commit()
+                    messagebox.showinfo("Success", "Course Delete Successfully", parent=self.root)
+                    self.show_courses()  # when we add data it will show in the table instantly
+
+
+        except Exception as ex:
+            messagebox.showerror("Error", f"Error due to {str(ex)}")
+
+
+
 
     def show_courses(self):
         connect = sqlite3.connect(database="rms.db")
