@@ -94,4 +94,3 @@ if __name__ == "__main__":
     obj = RMS(r)
     r.mainloop()
 
-    #################################helloworld
