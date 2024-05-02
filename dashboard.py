@@ -93,5 +93,3 @@ if __name__ == "__main__":
     r = Tk()
     obj = RMS(r)
     r.mainloop()
-
-##############rrrrrrrr
