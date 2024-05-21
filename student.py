@@ -11,14 +11,14 @@ class student_class:
         self.root.config(bg="#d3d9e2")
         self.root.focus_force() # to make focus forcefully from dashboard
 
-        title = Label(self.root,text="Manage Student", font="arial 15 bold", bg="#7e57c2", fg="white")
+        title = Label(self.root,text="Manage Student Info", font="arial 15 bold", bg="#7e57c2", fg="white")
         title.place(x=10, y=10, relwidth=0.985, height=45)
 
 #=========ROLL============
         roll = Label(self.root, text="Roll :", font="arial 13 ", bg="#fffcf2", bd="1",relief=RIDGE)
         roll.place(x=10, y=80, width=150, height=55)
 
-        self.roll_var = IntVar()
+        self.roll_var = StringVar()
         self.roll_entry = Entry(self.root, textvariable=self.roll_var, font="arial 13 ", bg="#eee9dc")  # Entry() is used for making input box
         self.roll_entry.place(x=160, y=80,  width=170, height=55)
 
@@ -48,6 +48,7 @@ class student_class:
         self.gender_entry = ttk.Combobox(self.root, textvariable=self.gender_var, font="arial 13 ",state='readonly',
                                  values=("Male","Female"))  # Entry() is used for making input box
         self.gender_entry.place(x=160, y=275, width=170, height=55)
+        self.gender_entry.set("           Select")
  #=========BIRTHDAY============
 
         birthday = Label(self.root, text="Birthday :", font="arial 13 ", bg="#fffcf2", bd="1", relief=RIDGE)
@@ -62,19 +63,24 @@ class student_class:
         contact = Label(self.root, text="Contact :", font="arial 13 ", bg="#fffcf2", bd="1", relief=RIDGE)
         contact.place(x=350, y=145, width=150, height=55)
 
-        self.contact_var = IntVar()
+        self.contact_var = StringVar()
         self.contact_entry = Entry(self.root, textvariable=self.contact_var, font="arial 13 ",
                                  bg="#eee9dc")  # Entry() is used for making input box
         self.contact_entry.place(x=500, y=145, width=170, height=55)
 #=========COURSE NAME============
 
+        self.course_list=[]
+        self.fetch_course()
+
         course_name = Label(self.root, text="Course Name :", font="arial 13 ", bg="#fffcf2", bd="1", relief=RIDGE)
         course_name.place(x=350, y=210, width=150, height=55)
 
         self.course_name_var = StringVar()
-        self.course_name_entry = Entry(self.root, textvariable=self.course_name_var, font="arial 13 ",
-                                       bg="#eee9dc")  # Entry() is used for making input box
+        self.course_name_entry = ttk.Combobox(self.root, textvariable=self.course_name_var, font="arial 13 ",state='readonly',
+                                       values=self.course_list)  # Entry() is used for making input box
         self.course_name_entry.place(x=500, y=210, width=170, height=55)
+        self.course_name_entry.set("           Select")
+
 #=========CITY============
         city = Label(self.root, text="City :", font="arial 13 ", bg="#fffcf2", bd="1", relief=RIDGE)
         city.place(x=350, y=275, width=150, height=55)
@@ -112,7 +118,7 @@ class student_class:
 
         # Search Panel
         self.search_var = StringVar()
-        search_label = Label(self.root, text="Course Name: ", font="arial 13", bg="white", bd="1", relief=RIDGE).place(x=700, y=80, height=55, width=160)
+        search_label = Label(self.root, text="Roll No.: ", font="arial 13", bg="white", bd="1", relief=RIDGE).place(x=700, y=80, height=55, width=160)
         search_entry = Entry(self.root, textvariable=self.search_var, font="arial 13", bg="white").place(x=870, y=80, width=360, height=55)
         btn_search = Button(self.root, text="Search", font="arial 13 bold", bg="dodgerblue", fg="white", cursor="hand2",command=self.search).place(x=1220, y=80, width=150, height=55)
 
@@ -124,25 +130,49 @@ class student_class:
 
         # Headings and Coloumns for the tables
 
-        self.CourseTable=ttk.Treeview(self.courseFrame,columns=("cid","name","duration","charges","address"))
+        self.CourseTable=ttk.Treeview(self.courseFrame,columns=("roll","name","email","gender","birthday","contact","course","city","address"))
         self.CourseTable.pack(fill=BOTH, expand=1)
 
-        self.CourseTable.heading("cid", text="Course ID")
+        self.CourseTable.heading("roll", text="Roll")
         self.CourseTable.heading("name", text="Name")
-        self.CourseTable.heading("duration", text="Duration")
-        self.CourseTable.heading("charges", text="Charges")
-        self.CourseTable.heading("address", text="address")
+        self.CourseTable.heading("email", text="Email")
+        self.CourseTable.heading("gender", text="Gender")
+        self.CourseTable.heading("birthday", text="Birthday")
+        self.CourseTable.heading("contact", text="Contact")
+        self.CourseTable.heading("course", text="Course")
+        self.CourseTable.heading("city", text="City")
+        self.CourseTable.heading("address", text="Address")
 
         self.CourseTable["show"] = "headings"
-        self.CourseTable.column("cid", width=100)
-        self.CourseTable.column("name", width=100)
-        self.CourseTable.column("duration", width=100)
-        self.CourseTable.column("charges", width=100)
-        self.CourseTable.column("address", width=150)
-        self.show_courses()  #all previous stored data will show
+        self.CourseTable.column("roll", width=30)
+        self.CourseTable.column("name", width=60)
+        self.CourseTable.column("email", width=100)
+        self.CourseTable.column("gender", width=50)
+        self.CourseTable.column("birthday", width=60)
+        self.CourseTable.column("contact", width=70)
+        self.CourseTable.column("course", width=60)
+        self.CourseTable.column("city", width=60)
+        self.CourseTable.column("address", width=70)
+        self.show_students()  #all previous stored data will show
 
 
 ##################
+
+    # fetch course for the select option of course list
+    def fetch_course(self):
+        connect = sqlite3.connect(database="rms.db")
+        cursor = connect.cursor()
+
+        try:
+            cursor.execute("SELECT name FROM course")
+            rows = cursor.fetchall()
+            if len(rows)>0:
+                for row in rows:
+                    self.course_list.append(row[0])
+        except Exception as ex:
+            messagebox.showerror("Error", f"Error occurred: {str(ex)}")
+
+
 #add course
     def add(self):
         connect = sqlite3.connect(database="rms.db")
@@ -151,26 +181,31 @@ class student_class:
         try:
             # Message box for no course entry
             if self.roll_var.get() == "":
-                messagebox.showerror("Error", "Course name required", parent=self.root)
+                messagebox.showerror("Error", "Roll Number required", parent=self.root)
             # Message box for entering an existing course
             else:
-                cursor.execute("SELECT * FROM course WHERE name=?", (self.roll_var.get(),))
+                cursor.execute("SELECT * FROM student WHERE roll=?", (self.roll_var.get(),))
                 row = cursor.fetchone()
                 if row is not None:
-                    messagebox.showerror("Error", "Course name already exists", parent=self.root)
+                    messagebox.showerror("Error", "Roll no. already exists", parent=self.root)
                 else:
-                    cursor.execute("INSERT INTO course (name, duration, charges, address) VALUES (?, ?, ?, ?)",
+                    cursor.execute("INSERT INTO student(roll,name,email,gender,birthday,contact,course,city,address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                    (
                                     self.roll_var.get(),
                                     self.name_var.get(),
                                     self.email_var.get(),
+                                    self.gender_var.get(),
+                                    self.birthday_var.get(),
+                                    self.contact_var.get(),
+                                    self.course_name_var.get(),
+                                    self.city_var.get(),
                                     self.address_entry.get("1.0", END)
-                                                )
+                                    )
                                    )
 
                     connect.commit()
-                    messagebox.showinfo("Success", "Course Added Successfully", parent=self.root)
-                    self.show_courses()  #when we add data it will show in the table instantly
+                    messagebox.showinfo("Success", "Student Added Successfully", parent=self.root)
+                    self.show_students()  #when we add data it will show in the table instantly
 
 
         except Exception as ex:
@@ -178,41 +213,40 @@ class student_class:
 
 
 
-#update course
+    #update course
+
     def update(self):
         connect = sqlite3.connect(database="rms.db")
         cursor = connect.cursor()
 
         try:
-            # Message box for no course entry
             if self.roll_var.get() == "":
-                messagebox.showerror("Error", "Course name required", parent=self.root)
-            # Message box for entering an existing course
+                messagebox.showerror("Error", "Roll Number required", parent=self.root)
             else:
-                cursor.execute("SELECT * FROM course WHERE name=?", (self.roll_var.get(),))
+                cursor.execute("SELECT * FROM student WHERE roll=?", (self.roll_var.get(),))
                 row = cursor.fetchone()
-                if row == None:
-                    messagebox.showerror("Error", "Select course from list", parent=self.root)
+                if row is None:
+                    messagebox.showerror("Error", "Select student from list.", parent=self.root)
                 else:
-                    cursor.execute("UPDATE course SET duration =? , charges =? , address =? where name =? ",
-                                   (
-
-                                    self.name_var.get(),
-                                    self.email_var.get(),
-                                    self.address_entry.get("1.0", END),
-                                    self.roll_var.get()
-                                                )
-                                   )
-
+                    cursor.execute(
+                        "UPDATE student SET name=?, email=?, gender=?, birthday=?, contact=?, course=?, city=?, address=? WHERE roll=?",
+                        (
+                            self.name_var.get(),
+                            self.email_var.get(),
+                            self.gender_var.get(),
+                            self.birthday_var.get(),
+                            self.contact_var.get(),
+                            self.course_name_var.get(),
+                            self.city_var.get(),
+                            self.address_entry.get("1.0", END),
+                            self.roll_var.get()
+                        ))
                     connect.commit()
-                    messagebox.showinfo("Success", "Course Update Successfully", parent=self.root)
-                    self.show_courses()  #when we add data it will show in the table instantly
-
+                    messagebox.showinfo("Success", "Student Updated Successfully", parent=self.root)
+                    self.show_students()
 
         except Exception as ex:
             messagebox.showerror("Error", f"Error due to {str(ex)}")
-
-
 
 
     # delete course
@@ -221,37 +255,30 @@ class student_class:
         cursor = connect.cursor()
 
         try:
-            # Message box for no course entry
             if self.roll_var.get() == "":
-                messagebox.showerror("Error", "Course name required", parent=self.root)
-            # Message box for entering an existing course
+                messagebox.showerror("Error", "Roll Number required", parent=self.root)
             else:
-                cursor.execute("SELECT * FROM course WHERE name=?", (self.roll_var.get(),))
+                cursor.execute("SELECT * FROM student WHERE roll=?", (self.roll_var.get(),))
                 row = cursor.fetchone()
-                if row == None:
-                    messagebox.showerror("Error", "Select course from list", parent=self.root)
+                if row is None:
+                    messagebox.showerror("Error", "Invalid Roll No.", parent=self.root)
                 else:
-                    cursor.execute("DELETE FROM course WHERE name=?",
-                                      (self.roll_var.get(),)
-                                   )
-
+                    cursor.execute("DELETE FROM student WHERE roll=?", (self.roll_var.get(),))
                     connect.commit()
-                    messagebox.showinfo("Success", "Course Delete Successfully", parent=self.root)
-                    self.show_courses()  # when we add data it will show in the table instantly
-
+                    messagebox.showinfo("Success", "Student Deleted Successfully", parent=self.root)
+                    self.show_students()
 
         except Exception as ex:
             messagebox.showerror("Error", f"Error due to {str(ex)}")
+        finally:
+            connect.close()
 
-
-
-
-    def show_courses(self):
+    def show_students(self):
         connect = sqlite3.connect(database="rms.db")
         cursor = connect.cursor()
 
         try:
-            cursor.execute("SELECT * FROM course")
+            cursor.execute("SELECT * FROM student")
             rows = cursor.fetchall()
 
             self.CourseTable.delete(*self.CourseTable.get_children())
@@ -262,21 +289,26 @@ class student_class:
         except Exception as ex:
             messagebox.showerror("Error", f"Error occurred: {str(ex)}")
 
+
+
     def search(self):
         connect = sqlite3.connect(database="rms.db")
         cursor = connect.cursor()
 
         try:
             # Fetch courses matching the search criteria
-            cursor.execute("SELECT * FROM course WHERE name LIKE ?", ('%' + self.search_var.get() + '%',))
-            rows = cursor.fetchall()
+            cursor.execute("SELECT * FROM student WHERE roll=?", (self.search_var.get(),))
 
-            # Clear the existing data in the table widget
-            self.CourseTable.delete(*self.CourseTable.get_children())
+            rows = cursor.fetchone()
 
-            # Insert fetched courses into the table widget
-            for row in rows:
-                self.CourseTable.insert('', 'end', values=row)
+            if rows!=None:
+
+                # Clear the existing data in the table widget
+                self.CourseTable.delete(*self.CourseTable.get_children())
+                # Insert fetched courses into the table widget
+                self.CourseTable.insert('', 'end', values=rows)
+            else:
+                messagebox.showerror("Error", "No Record found", parent=self.root)
 
         except Exception as ex:
             messagebox.showerror("Error", f"Error occurred: {str(ex)}")
