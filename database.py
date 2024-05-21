@@ -25,8 +25,18 @@ def create_database():
                         )''')
 
 
+    cursor.execute('''CREATE TABLE IF NOT EXISTS result (
+                                roll INTEGER PRIMARY KEY AUTOINCREMENT,
+                                name TEXT,
+                                course TEXT,
+                                marks TEXT,
+                                full_marks TEXT,
+                                percent TEXT
+                            )''')
+
     connect.commit()
     print("Database and tables created successfully.")
 
 if __name__ == "__main__":
     create_database()
+

@@ -64,7 +64,14 @@ class RMS:
         results.place(x=50, y=350, width=300, height=100)
 
 
+#==========Image=========
+        self.img = Image.open("Images/rms.jpg")
+        self.img = self.img.resize((1070, 500),)
+        self.img = ImageTk.PhotoImage(self.img)
 
+        self.img_label = Label(self.root, image=self.img).place(x=10, y=270)
+
+# ==========footer=========
         footer=Label(self.root,text="© All Right Reserved", font="arial 10",fg="white",bg="navy", pady=5).pack(side=BOTTOM,fill="x")
 
 
