@@ -23,6 +23,8 @@ def create_database():
                             city TEXT,
                             address TEXT
                         )''')
+
+
     connect.commit()
     print("Database and tables created successfully.")
 
