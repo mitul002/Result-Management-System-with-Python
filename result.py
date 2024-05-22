@@ -72,9 +72,13 @@ class result_class:
         self.full_mark_entry.place(x=210, y=340, width=330, height=55)
 
 
-        self.add=Button(self.root,text="Add ",font="arial 13 bold",bg="#FFBE00",fg="white",cursor="hand2", command=self.add)
-        self.add.place(x=10,y=410,width=530,height=55)
+        self.add=Button(self.root,text="Add ",font="arial 13 bold",bg="slateblue",fg="white",cursor="hand2", command=self.add)
+        self.add.place(x=10,y=410,width=400,height=55)
 
+
+
+        self.clear=Button(self.root,text="Clear ",font="arial 13 bold",bg="#FFBE00",fg="white",cursor="hand2",command=self.clear)
+        self.clear.place(x=415,y=410,width=125,height=55)
 ###
         # Search Panel
         self.search_var = StringVar()
@@ -156,10 +160,11 @@ class result_class:
         except Exception as ex:
             messagebox.showerror("Error", f"Error occurred: {str(ex)}")
 
-
-
-
-
+    def clear(self):
+        self.name_var.set("")
+        self.course_name_var.set("")
+        self.mark_obtain_var.set("")
+        self.full_mark_var.set("")
 
 
 if __name__ == "__main__":
