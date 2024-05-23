@@ -1,8 +1,10 @@
 import sqlite3
 
+
 def create_database():
     connect = sqlite3.connect(database="rms.db")
     cursor = connect.cursor()
+
     cursor.execute('''CREATE TABLE IF NOT EXISTS course (
                             cid INTEGER PRIMARY KEY AUTOINCREMENT,
                             name TEXT,
@@ -24,19 +26,20 @@ def create_database():
                             address TEXT
                         )''')
 
-
     cursor.execute('''CREATE TABLE IF NOT EXISTS result (
-                                roll INTEGER PRIMARY KEY AUTOINCREMENT,
-                                name TEXT,
-                                course TEXT,
-                                marks TEXT,
-                                full_marks TEXT,
-                                percent TEXT
-                            )''')
+                            roll INTEGER,
+                            name TEXT,
+                            course TEXT,
+                            marks TEXT,
+                            full_marks TEXT,
+                            percent TEXT,
+                            FOREIGN KEY (roll) REFERENCES student (roll)
+                        )''')
 
     connect.commit()
     print("Database and tables created successfully.")
+    connect.close()
+
 
 if __name__ == "__main__":
     create_database()
-

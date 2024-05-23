@@ -24,7 +24,7 @@ class view_result_class:
         btn_clear = Button(self.root, text="Clear", font="arial 13 bold", bg="#FFBE00", fg="white", cursor="hand2", command=self.clear)
         btn_clear.place(x=900, y=80, width=150, height=55)
 
-        self.delete = Button(text="Delete", font="arial 13 bold", bg="tomato", fg="white", cursor="hand2", command=self.confirm_delete)
+        self.delete = Button(self.root,text="Delete", font="arial 13 bold", bg="tomato", fg="white", cursor="hand2", command=self.confirm_delete)
         self.delete.place(x=150, y=280, width=900, height=50)
 
         label_roll = Label(self.root, text="Roll No", font=("arial 15 "), bg="white", bd=2, relief=GROOVE)
@@ -88,7 +88,7 @@ class view_result_class:
         if self.search_var.get() == "":
             messagebox.showerror("Error", "Roll No. Required", parent=self.root)
         else:
-            confirm = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this record?")
+            confirm = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this record?", parent=self.root)
             if confirm:
                 self.delete_record()
 
